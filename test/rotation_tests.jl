@@ -208,7 +208,9 @@ all_types = (RotMatrix{3}, Quat, SPQuat, AngleAxis, RodriguesVec,
         for type_rot in all_types
             for _ = 1:100
                 not_orthonormal = rand(type_rot) + rand(3, 3) * pert
-                @test norm(Quat(not_orthonormal) - nearest_orthonormal(not_orthonormal)) < 10pert
+                quat_ill_cond = Quat(not_orthonormal)
+                @test 0 <= quat_ill_cond.w
+                @test norm(quat_ill_cond - nearest_orthonormal(not_orthonormal)) < 10 * pert
             end
         end
     end
@@ -304,26 +306,26 @@ all_types = (RotMatrix{3}, Quat, SPQuat, AngleAxis, RodriguesVec,
       a=[1.0 0.0 0.0
          0.0 0.0 -1.0
          0.0 1.0 0.0]
-      @test isrotation(a) 
+      @test isrotation(a)
       foreach(rot_types) do rot_type
         foreach(1:20) do idx
           @test isrotation(rand(rot_type))
-        end 
+        end
       end
       a=[40.0 0.0 0.0
          0.0 0.0 1.0
          0.0 1.0 0.0]
-      @test !isrotation(a) 
+      @test !isrotation(a)
       a=[1.0 0.0 0.0
          0.0 0.0 1.0
          0.0 1.0 0.0]
-      @test !isrotation(a) 
+      @test !isrotation(a)
 
       # isrotation should work for integer (or boolean) matrices (issue #94)
       @test isrotation([0 1 0; -1 0 0; 0 0 1])
       @test isrotation(Matrix(I,3,3))
-    end 
-    
+    end
+
     @testset "Testing type aliases" begin
         @test one(RotMatrix{2, Float64}) isa RotMatrix2{Float64}
         @test one(RotMatrix{3, Float64}) isa RotMatrix3{Float64}
