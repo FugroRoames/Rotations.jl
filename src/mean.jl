@@ -37,8 +37,8 @@ function Statistics.mean(qvec::AbstractVector{Quat{T}}, method::Integer = 0) whe
             Qi = @SVector [q.w, q.x, q.y, q.z]  # convert types to ensure we don't get quaternion multiplication
             M .+= Qi * (Qi')
         end
-        evec = eigfact(Symmetric(M), 4:4)
-        Qbar = Quat(evec.vectors[1], evec.vectors[2], evec.vectors[3], evec.vectors[4]) # This will renormalize the quaternion...
+        vectors = eigvecs(Symmetric(M))[:, 4]
+        Qbar = Quat(vectors[1], vectors[2], vectors[3], vectors[4]) # This will renormalize the quaternion...
     #else
     #    error("I haven't coded this")
     #end
@@ -47,5 +47,5 @@ function Statistics.mean(qvec::AbstractVector{Quat{T}}, method::Integer = 0) whe
 end
 
 function Statistics.mean(vec::AbstractVector{R}) where R<:Rotation
-    R(mean(convert(Vector{Quat{eltype(R)}}, vec)))
+    R(Statistics.mean(convert(Vector{Quat{eltype(R)}}, vec)))
 end
