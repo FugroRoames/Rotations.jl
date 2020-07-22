@@ -240,6 +240,7 @@ end
     UnitQuaternion(zero(x), x, y, z, false)
 
 function exp(q::Q) where Q <: UnitQuaternion
+    q.w == q.x == q.y == q.z == 0 && return one(Q)
     θ = vecnorm(q)
     sθ,cθ = sincos(θ)
     es = exp(q.w)
