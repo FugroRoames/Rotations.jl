@@ -1,4 +1,5 @@
 using Rotations, StaticArrays, Test
+using Unitful
 
 @testset "2d Rotations" begin
 
@@ -10,6 +11,13 @@ using Rotations, StaticArrays, Test
         r = one(RotMatrix{2,Float32})
         @test RotMatrix((1,0,0,1)) == RotMatrix(@SMatrix [1 0; 0 1])
         @test_throws DimensionMismatch RotMatrix((1,0,0,1,0))
+    end
+
+    @testset "Unitful" begin
+        # Make sure rotations created from unitful angles
+        # don't extraneously contain those units (see issue #55)
+        @test eltype(Angle2d(10u"°")) <: Real
+        @test eltype(Angle2d(20u"rad")) <: Real
     end
 
     ###############################
@@ -72,6 +80,33 @@ using Rotations, StaticArrays, Test
             @test r*v ≈ m*v
         end
     end
+
+    # a random rotation of a random unitful point
+    @testset "Rotate Unitful Points" begin
+        repeats = 100
+        for R in [RotMatrix{2}, Angle2d]
+            Random.seed!(0)
+            for i = 1:repeats
+                r = rand(R)
+                m = SMatrix(r)
+                v = randn(SVector{2}) * u"m"
+
+                @test r*v ≈ m*v
+                @test eltype(r*v) <: Unitful.Length
+                @test eltype(m*v) <: Unitful.Length
+            end
+
+            # Test Base.Vector also
+            r = rand(R)
+            m = SMatrix(r)
+            v = randn(2) * u"m"
+
+            @test r*v ≈ m*v
+            @test eltype(r*v) <: Unitful.Length
+            @test eltype(m*v) <: Unitful.Length
+        end
+    end
+
 
     # compose two random rotations
     @testset "Compose rotations" begin

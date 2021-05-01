@@ -41,3 +41,9 @@ end
 function vee(S::AbstractMatrix)
     return @SVector [S[3,2], S[1,3], S[2,1]]
 end
+
+"""
+The element type for a rotation matrix with a given angle type is composed of
+trigonometric functions of that type.
+"""
+Base.@pure rot_eltype(angle_type) = typeof(sin(zero(angle_type)))

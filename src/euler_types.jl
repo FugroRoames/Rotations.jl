@@ -9,10 +9,6 @@
 # Single axis rotations #
 #########################
 
-# The element type for a rotation matrix with a given angle type is composed of
-# trigonometric functions of that type.
-Base.@pure rot_eltype(angle_type) = typeof(sin(zero(angle_type)))
-
 for axis in [:X, :Y, :Z]
     RotType = Symbol("Rot" * string(axis))
     @eval begin
