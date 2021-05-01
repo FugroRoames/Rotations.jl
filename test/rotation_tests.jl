@@ -205,6 +205,24 @@ all_types = (RotMatrix{3}, AngleAxis, RotationVec,
         end
     end
 
+    @testset "Convert rotations 1-axis -> 2-axis" begin
+        repeats = 100
+        @testset "convert $(R1) -> $(R2)" for R1 in one_types, R2 in two_types
+            # Check if the two-axis include one-axis
+            if string(R1)[end] in string(R2)[end-1:end]
+                Random.seed!(0)
+                for i = 1:repeats
+                    r1 = rand(R1)
+                    m1 = SMatrix(r1)
+
+                    r2 = R2(r1)
+
+                    @test r2 ≈ m1
+                end
+            end
+        end
+    end
+
     #########################################################################
     # Test robustness of DCM to UnitQuaternion function
     #########################################################################
