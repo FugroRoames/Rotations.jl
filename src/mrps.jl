@@ -56,12 +56,12 @@ function (*)(p2::MRP, p1::MRP)
 end
 
 function (\)(p1::MRP, p2::MRP)
-    p1,p2 = params(p1), params(p2)
-    n1,n2 = p1'p1, p2'p2
+    q1,q2 = params(p1), params(p2)
+    n1,n2 = q1'q1, q2'q2
     θ = 1/((1+n1)*(1+n2))
     s1,s2 = (1-n1), (1-n2)
-    v1 = -2p1
-    v2 =  2p2
+    v1 = -2q1
+    v2 =  2q2
     s = s1*s2 - v1'v2
     v = s1*v2 + s2*v1 + v1 × v2
 
@@ -70,18 +70,17 @@ function (\)(p1::MRP, p2::MRP)
 end
 
 function (/)(p1::MRP, p2::MRP)
-    n1,n2 = LinearAlgebra.norm2(p1),   LinearAlgebra.norm2(p2)
+    q1,q2 = params(p1), params(p2)
+    n1,n2 = q1'q1, q2'q2
     θ = 1/((1+n1)*(1+n2))
     s1,s2 = (1-n1), (1-n2)
-    p1,p2 = params(p1), params(p2)
-    v1 =  2p1
-    v2 = -2p2
+    v1 =  2q1
+    v2 = -2q2
     s = s1*s2 - v1'v2
     v = s1*v2 + s2*v1 + v1 × v2
 
     M = θ/(1+θ*s)
-    MRP(v[1]*M, v[2]*M, v[3]*M)
-
+    return MRP(v*M)
 end
 
 
@@ -195,17 +194,17 @@ end
 Jacobian of `p1\\p2` wrt `p2`
 """
 function ∇err(p1::MRP, p2::MRP)
-    n1,n2 = LinearAlgebra.norm2(p1),   LinearAlgebra.norm2(p2)
+    q1,q2 = params(p1), params(p2)
+    n1,n2 = q1'q1,   q2'q2
     θ = 1/((1+n1)*(1+n2))
     s1,s2 = (1-n1), (1-n2)
-    p1,p2 = params(p1), params(p2)
-    v1 = -2p1
-    v2 =  2p2
+    v1 = -2q1
+    v2 =  2q2
     s = s1*s2 - v1'v2
     v = s1*v2 + s2*v1 + v1 × v2
-    dsdp = -2s1*p2 - 2v1
-    dvdp = 2s1*I + -2v1*p2' + 2skew(v1)
-    dθdp = -θ^2*(1+n1)*2p2
+    dsdp = -2s1*q2 - 2v1
+    dvdp = 2s1*I + -2v1*q2' + 2skew(v1)
+    dθdp = -θ^2*(1+n1)*2q2
 
     M = θ/(1+θ*s)
     dMdp = 1/(1+θ*s)*dθdp - θ/(1+θ*s)^2*(dθdp*s + θ*dsdp)
@@ -219,23 +218,23 @@ Jacobian of `(∂/∂p p1\\p2)'b` wrt `p2`
 """
 function ∇²err(p1::MRP, p2::MRP, b::AbstractVector)
     check_length(b, 3)
-    n1,n2 = LinearAlgebra.norm2(p1),   LinearAlgebra.norm2(p2)
+    q1,q2 = params(p1), params(p2)
+    n1,n2 = q1'q1, q2'q2
     θ = 1/((1+n1)*(1+n2))
     s1,s2 = (1-n1), (1-n2)
-    p1,p2 = params(p1), params(p2)
-    v1 = -2p1
-    v2 =  2p2
+    v1 = -2q1
+    v2 =  2q2
     s = s1*s2 - v1'v2
     v = s1*v2 + s2*v1 + v1 × v2
 
-    dsdp = -2s1*p2 - 2v1  # 3x1
+    dsdp = -2s1*q2 - 2v1  # 3x1
     dsdp2 = -2s1*I  # 3x3
 
-    dvdp = 2s1*b + -2p2*v1'b - 2skew(v1)*b
+    dvdp = 2s1*b + -2q2*v1'b - 2skew(v1)*b
     dvdp2 = -I*2v1'b
 
-    dθdp = -θ^2*(1+n1)*2p2  # 3x1
-    dθdp2 = -2θ*(1+n1)*2p2*dθdp' - θ^2*(1+n1)*2I # 3x3
+    dθdp = -θ^2*(1+n1)*2q2  # 3x1
+    dθdp2 = -2θ*(1+n1)*2q2*dθdp' - θ^2*(1+n1)*2I # 3x3
 
     M = θ/(1+θ*s)  # scalar
     dMdp = 1/(1+θ*s)*dθdp - θ/(1+θ*s)^2*(dθdp*s + θ*dsdp) # 3x1
@@ -248,8 +247,8 @@ function ∇²err(p1::MRP, p2::MRP, b::AbstractVector)
     dMdp2 -= dM3*dM2dp + dM2*dM3dp
 
     vb = s1*v2'b + s2*v1'b + b'skew(v1)*v2  # scalar
-    vpdp = s1*2b' - 2p2' * (v1'b)  + b'skew(v1)*2 # good
-    # vpdp = s1*2b' - 2p2 * (v1'b)
+    vpdp = s1*2b' - 2q2' * (v1'b)  + b'skew(v1)*2 # good
+    # vpdp = s1*2b' - 2q2 * (v1'b)
 
     d1 = M*dvdp2 + dvdp*dMdp'
     d2 = dMdp2*vb + dMdp*vpdp

@@ -112,13 +112,16 @@ all_types = (RotMatrix{3}, AngleAxis, RotationVec,
         @testset "$(R)" for R in all_types
             Random.seed!(0)
             for i = 1:repeats
-                r = rand(R)
-                @test inv(r) == adjoint(r)
-                @test inv(r) == transpose(r)
-                @test inv(r)*r ≈ I
-                @test r*inv(r) ≈ I
-                @test r/r ≈ I
-                @test r\r ≈ I
+                r1 = rand(R)
+                r2 = rand(R)
+                @test inv(r1) == adjoint(r1)
+                @test inv(r1) == transpose(r1)
+                @test inv(r1)*r1 ≈ I
+                @test r1*inv(r1) ≈ I
+                @test r1/r1 ≈ I
+                @test r1\r1 ≈ I
+                @test r1/r2 ≈ r1*inv(r2)
+                @test r1\r2 ≈ inv(r1)*r2
             end
         end
     end
