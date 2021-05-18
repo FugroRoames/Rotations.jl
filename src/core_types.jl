@@ -25,25 +25,25 @@ Base.convert(::Type{R}, rot::Rotation{N}) where {N,R<:Rotation{N}} = R(rot)
 Base.@pure StaticArrays.similar_type(::Union{R,Type{R}}) where {R <: Rotation} = SMatrix{size(R)..., eltype(R), prod(size(R))}
 Base.@pure StaticArrays.similar_type(::Union{R,Type{R}}, ::Type{T}) where {R <: Rotation, T} = SMatrix{size(R)..., T, prod(size(R))}
 
-function Base.rand(::Type{R}) where R <: Rotation{2}
+function Random.rand(rng::AbstractRNG, ::Random.SamplerType{R}) where R <: Rotation{2}
     T = eltype(R)
     if T == Any
         T = Float64
     end
 
-    R(2π * rand(T))
+    R(2π * rand(rng, T))
 end
 
 # A random rotation can be obtained easily with unit quaternions
 # The unit sphere in R⁴ parameterizes quaternion rotations according to the
 # Haar measure of SO(3) - see e.g. http://math.stackexchange.com/questions/184086/uniform-distributions-on-the-space-of-rotations-in-3d
-function Base.rand(::Type{R}) where R <: Rotation{3}
+function Random.rand(rng::AbstractRNG, ::Random.SamplerType{R}) where R <: Rotation{3}
     T = eltype(R)
     if T == Any
         T = Float64
     end
 
-    q = UnitQuaternion(randn(T), randn(T), randn(T), randn(T))
+    q = UnitQuaternion(randn(rng, T), randn(rng, T), randn(rng, T), randn(rng, T))
     return R(q)
 end
 

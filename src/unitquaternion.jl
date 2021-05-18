@@ -198,9 +198,9 @@ Rotations.params(p) == @SVector [1.0, 2.0, 3.0]  # true
 @inline params(q::UnitQuaternion) = SVector{4}(q.w, q.x, q.y, q.z)
 
 # ~~~~~~~~~~~~~~~ Initializers ~~~~~~~~~~~~~~~ #
-Base.rand(::Type{<:UnitQuaternion{T}}) where T =
-    normalize(UnitQuaternion{T}(randn(T), randn(T), randn(T), randn(T)))
-Base.rand(::Type{UnitQuaternion}) = Base.rand(UnitQuaternion{Float64})
+function Random.rand(rng::AbstractRNG, ::Random.SamplerType{<:UnitQuaternion{T}}) where T
+    normalize(UnitQuaternion{T}(randn(rng,T), randn(rng,T), randn(rng,T), randn(rng,T)))
+end
 @inline Base.zero(::Type{Q}) where Q <: UnitQuaternion = Q(1.0, 0.0, 0.0, 0.0)
 @inline Base.one(::Type{Q}) where Q <: UnitQuaternion = Q(1.0, 0.0, 0.0, 0.0)
 

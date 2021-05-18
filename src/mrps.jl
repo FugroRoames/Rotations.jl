@@ -25,7 +25,9 @@ MRP(x::X, y::Y, z::Z) where {X,Y,Z} = MRP{promote_type(X,Y,Z)}(x, y, z)
 params(g::MRP) = SVector{3}(g.x, g.y, g.z)
 
 # ~~~~~~~~~~~~~~~ Initializers ~~~~~~~~~~~~~~~ #
-Base.rand(::Type{RP}) where RP <: MRP = RP(rand(UnitQuaternion))
+function Random.rand(rng::AbstractRNG, ::Random.SamplerType{RP}) where RP <: MRP
+    RP(rand(rng, UnitQuaternion))
+end
 Base.one(::Type{RP}) where RP <: MRP = RP(0.0, 0.0, 0.0)
 
 # ~~~~~~~~~~~~~~~~ Quaternion <=> MRP ~~~~~~~~~~~~~~~~~~ #

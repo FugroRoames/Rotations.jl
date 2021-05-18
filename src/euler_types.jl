@@ -40,13 +40,13 @@ for axis in [:X, :Y, :Z]
     end
 end
 
-function Base.rand(::Type{R}) where R <: Union{RotX,RotY,RotZ}
+function Random.rand(rng::AbstractRNG, ::Random.SamplerType{R}) where R <: Union{RotX,RotY,RotZ}
     T = eltype(R)
     if T == Any
         T = Float64
     end
 
-    return R(2*pi*rand(T))
+    return R(2π*rand(rng, T))
 end
 
 
@@ -257,7 +257,7 @@ for axis1 in [:X, :Y, :Z]
     end
 end
 
-function Base.rand(::Type{R}) where R <: Union{RotXY,RotYZ,RotZX, RotXZ, RotYX, RotZY}
+function Random.rand(rng::AbstractRNG, ::Random.SamplerType{R}) where R <: Union{RotXY,RotYZ,RotZX, RotXZ, RotYX, RotZY}
     T = eltype(R)
     if T == Any
         T = Float64
@@ -266,7 +266,7 @@ function Base.rand(::Type{R}) where R <: Union{RotXY,RotYZ,RotZX, RotXZ, RotYX, 
     # Not really sure what this distribution is, but it's also not clear what
     # it should be! rand(RotXY) *is* invariant to pre-rotations by a RotX and
     # post-rotations by a RotY...
-    return R(2*pi*rand(T), 2*pi*rand(T))
+    return R(2π*rand(rng, T), 2π*rand(rng, T))
 end
 
 
