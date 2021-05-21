@@ -201,7 +201,6 @@ Rotations.params(p) == @SVector [1.0, 2.0, 3.0]  # true
 Base.rand(::Type{<:UnitQuaternion{T}}) where T =
     normalize(UnitQuaternion{T}(randn(T), randn(T), randn(T), randn(T)))
 Base.rand(::Type{UnitQuaternion}) = Base.rand(UnitQuaternion{Float64})
-@inline Base.zero(::Type{Q}) where Q <: UnitQuaternion = Q(1.0, 0.0, 0.0, 0.0)
 @inline Base.one(::Type{Q}) where Q <: UnitQuaternion = Q(1.0, 0.0, 0.0, 0.0)
 
 
