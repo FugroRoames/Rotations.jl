@@ -162,6 +162,7 @@ using Rotations, StaticArrays, Test
             r2 = RotMatrix{2}(theta)
             @test rotation_angle(r2) ≈ theta
             @test rotation_angle(a2d) == theta
+            @test rotation_angle(a2d) == Rotations.params(a2d)[1]
         end
     end
 end

@@ -37,6 +37,8 @@ for axis in [:X, :Y, :Z]
         # define null rotations for convenience
         @inline Base.one(::Type{$RotType}) = $RotType(0.0)
         @inline Base.one(::Type{$RotType{T}}) where {T} = $RotType{T}(zero(T))
+
+        params(r::$RotType) = SVector{1}(r.theta)
     end
 end
 
@@ -253,6 +255,8 @@ for axis1 in [:X, :Y, :Z]
             # define null rotations for convenience
             @inline Base.one(::Type{$RotType}) = $RotType(0.0, 0.0)
             @inline Base.one(::Type{$RotType{T}}) where {T} = $RotType{T}(zero(T), zero(T))
+
+            params(r::$RotType) = SVector{2}(r.theta1, r.theta2)
         end
     end
 end
@@ -535,6 +539,8 @@ for axis1 in [:X, :Y, :Z]
                 # define null rotations for convenience
                 @inline Base.one(::Type{$RotType}) = $RotType(0.0, 0.0, 0.0)
                 @inline Base.one(::Type{$RotType{T}}) where {T} = $RotType{T}(zero(T), zero(T), zero(T))
+
+                params(r::$RotType) = SVector{3}(r.theta1, r.theta2, r.theta3)
             end
         end
     end

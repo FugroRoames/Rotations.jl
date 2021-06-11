@@ -37,6 +37,8 @@ struct AngleAxis{T} <: Rotation{3,T}
     end
 end
 
+params(aa::AngleAxis) = SVector{4}(aa.theta, aa.axis_x, aa.axis_y, aa.axis_z)
+
 # StaticArrays will take over *all* the constructors and put everything in a tuple...
 # but this isn't quite what we mean when we have 4 inputs (not 9).
 @inline function AngleAxis(θ::Θ, x::X, y::Y, z::Z, normalize::Bool = true) where {Θ,X,Y,Z}
@@ -138,6 +140,8 @@ struct RotationVec{T} <: Rotation{3,T}
     sy::T
     sz::T
 end
+
+params(aa::RotationVec) = SVector{3}(aa.sx, aa.sy, aa.sz)
 
 # StaticArrays will take over *all* the constructors and put everything in a tuple...
 # but this isn't quite what we mean when we have 4 inputs (not 9).

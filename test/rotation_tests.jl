@@ -419,4 +419,16 @@ all_types = (RotMatrix{3}, AngleAxis, RotationVec,
     @testset "Regression test issue 137" begin
         @test det(RotationVec(1e19, 0.0, 0.0)) ≈ 1.
     end
+
+    @testset "params" begin
+        p1, p2, p3, p4 = randn(4)
+        @test Rotations.params(RotX(p1)) == [p1]
+        @test Rotations.params(RotXY(p1,p2)) == [p1,p2]
+        @test Rotations.params(RotXYZ(p1,p2,p3)) == [p1,p2,p3]
+        @test Rotations.params(AngleAxis(p1,p2,p3,p4)) ≈ pushfirst!(normalize([p2,p3,p4]),p1)
+        @test Rotations.params(RotationVec(p1,p2,p3)) == [p1,p2,p3]
+        @test Rotations.params(UnitQuaternion(p1,p2,p3,p4)) ≈ normalize([p1,p2,p3,p4])
+        @test Rotations.params(MRP(p1,p2,p3)) == [p1,p2,p3]
+        @test Rotations.params(RodriguesParam(p1,p2,p3)) == [p1,p2,p3]
+    end
 end

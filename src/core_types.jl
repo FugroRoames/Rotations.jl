@@ -140,6 +140,8 @@ struct Angle2d{T} <: Rotation{2,T}
     theta::T
 end
 
+params(r::Angle2d) = SVector{1}(r.theta)
+
 Angle2d(r::Rotation{2}) = Angle2d(rotation_angle(r))
 Angle2d{T}(r::Rotation{2}) where {T} = Angle2d{T}(rotation_angle(r))
 
